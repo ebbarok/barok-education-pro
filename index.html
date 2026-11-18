@@ -63,8 +63,8 @@
     </div>
   </section>
   <section id="dashboard" class="page hidden"><div class="card"><h2>Student Dashboard</h2><div id="dashboardContent" class="muted">Please log in to view your dashboard.</div></div></section>
-  <section id="courses" class="page hidden"><h2>Courses</h2><p class="muted">Published courses for Grades 9–12.</p><div id="coursesList" class="grid"><div class="empty">Loading courses…</div></div></section>
-  <section id="lessons" class="page hidden"><h2>Lessons & Notes</h2><div id="lessonsList" class="grid"><div class="empty">Loading lessons…</div></div></section>
+  <section id="courses" class="page hidden"><h2>Courses</h2><p class="muted">Published courses for Grades 9–12.</p><div class="card"><label for="courseGradeFilter">Choose grade</label><select id="courseGradeFilter"><option value="">All grades</option><option value="9">Grade 9</option><option value="10">Grade 10</option><option value="11">Grade 11</option><option value="12">Grade 12</option></select></div><div id="coursesList" class="grid"><div class="empty">Loading courses…</div></div></section>
+  <section id="lessons" class="page hidden"><h2>Lessons & Notes</h2><div class="card"><label for="lessonGradeFilter">Choose grade</label><select id="lessonGradeFilter"><option value="">All grades</option><option value="9">Grade 9</option><option value="10">Grade 10</option><option value="11">Grade 11</option><option value="12">Grade 12</option></select><label for="lessonSubjectFilter">Choose subject</label><select id="lessonSubjectFilter"><option value="">All subjects</option><option>Mathematics</option><option>English</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Information Technology</option><option>Geography</option><option>History</option><option>Economics</option><option>Agriculture</option></select></div><div id="lessonsList" class="grid"><div class="empty">Loading lessons…</div></div></section>
   <section id="exams" class="page hidden"><h2>Exams</h2><div class="notice">ፈተናዎች ዝርዝር እዚህ ይታያል። Secure exam answering and submission will be enabled in a later update.</div><div id="examsList" class="grid"></div></section>
   <section id="results" class="page hidden"><h2>My Results</h2><div id="resultsList" class="grid"><div class="empty">Log in to view your results.</div></div></section>
   <section id="profile" class="page hidden"><div class="card"><h2>My Profile</h2><div id="profileContent" class="muted">Please log in.</div></div></section>
@@ -124,10 +124,23 @@
   }
   function renderProfile(){if(!currentUser){$("profileContent").textContent="Please log in.";return;}
     $("profileContent").innerHTML='<p><strong>Name:</strong> '+safe(student?.name||"Not set")+'</p><p><strong>Grade:</strong> '+safe(student?.grade||"Not set")+'</p><p><strong>Email:</strong> '+safe(currentUser.email)+'</p>';}
+  $("courseGradeFilter").addEventListener("change",()=>loadPublic("courses","coursesList"));
+  $("lessonGradeFilter").addEventListener("change",()=>loadPublic("lessons","lessonsList"));
+  $("lessonSubjectFilter").addEventListener("change",()=>loadPublic("lessons","lessonsList"));
   async function loadPublic(collectionName,targetId){const target=$(targetId);target.innerHTML='<div class="empty">Loading…</div>';try{
     const snap=await getDocs(query(collection(db,collectionName),where("published","==",true)));
-    if(snap.empty){target.innerHTML='<div class="empty">No published '+safe(collectionName)+' available yet.</div>';return;}
-    target.innerHTML=snap.docs.map(d=>{const x=d.data();return '<article class="card"><span class="pill">'+safe(x.grade?"Grade "+x.grade:"BAROK EDUCATION")+'</span><h3>'+safe(x.title||x.name||"Untitled")+'</h3><p class="muted">'+safe(x.description||x.subject||"")+'</p>'+(x.content?'<p>'+safe(x.content)+'</p>':"")+(x.url&&/^https:\/\//i.test(x.url)?'<a rel="noopener" target="_blank" href="'+safe(x.url)+'">Open resource</a>':"")+'</article>';}).join("");
+    let docs=snap.docs;
+    if(collectionName==="courses"){
+      const grade=$("courseGradeFilter").value;
+      if(grade)docs=docs.filter(d=>String(d.data().grade)===grade);
+    }
+    if(collectionName==="lessons"){
+      const grade=$("lessonGradeFilter").value, subject=$("lessonSubjectFilter").value.toLowerCase();
+      if(grade)docs=docs.filter(d=>String(d.data().grade)===grade);
+      if(subject)docs=docs.filter(d=>String(d.data().subject||d.data().title||"").toLowerCase().includes(subject));
+    }
+    if(!docs.length){target.innerHTML='<div class="empty">No matching published '+safe(collectionName)+' found. Try another filter.</div>';return;}
+    target.innerHTML=docs.map(d=>{const x=d.data();return '<article class="card"><span class="pill">'+safe(x.grade?"Grade "+x.grade:"BAROK EDUCATION")+'</span><h3>'+safe(x.title||x.name||"Untitled")+'</h3><p class="muted">'+safe(x.description||x.subject||"")+'</p>'+(x.unit?'<p><strong>Unit:</strong> '+safe(x.unit)+'</p>':"")+(x.content?'<p>'+safe(x.content)+'</p>':"")+(x.url&&/^https:\/\//i.test(x.url)?'<a rel="noopener" target="_blank" href="'+safe(x.url)+'">Open resource</a>':"")+'</article>';}).join("");
   }catch(err){target.innerHTML='<div class="empty">Unable to load. Please check Firestore Security Rules.</div>';}}
   async function loadResults(){const target=$("resultsList");if(!currentUser){target.innerHTML='<div class="empty">Log in to view your results.</div>';return;}target.innerHTML='<div class="empty">Loading results…</div>';try{
     const snap=await getDocs(query(collection(db,"results"),where("uid","==",currentUser.uid)));
