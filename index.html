@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#102a43">
+  <meta name="description" content="BAROK EDUCATION PRO provides learning resources, courses, lesson notes and assessments for Grades 9–12. Learn Today, Lead Tomorrow.">
+  <meta property="og:title" content="BAROK EDUCATION PRO">
+  <meta property="og:description" content="Quality Education for Grades 9–12. Learn Today, Lead Tomorrow.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://barok-education-pro.web.app/">
   <title>BAROK EDUCATION PRO</title>
   <style>
     :root{--navy:#102a43;--blue:#1769aa;--gold:#f2b84b;--paper:#f4f7fb;--ink:#172b4d;--muted:#62748a;--white:#fff;--line:#dce5ef}
@@ -57,7 +62,7 @@
           <label>Email</label><input id="regEmail" type="email" required autocomplete="email"><label>Password</label><input id="regPassword" type="password" minlength="8" required autocomplete="new-password">
           <button class="action" type="submit">Create account</button></form>
       </div>
-      <div class="card"><h2>Student Login</h2><form id="loginForm"><label>Email</label><input id="loginEmail" type="email" required autocomplete="email"><label>Password</label><input id="loginPassword" type="password" required autocomplete="current-password"><button class="action" type="submit">Login</button></form>
+      <div class="card"><h2>Student Login</h2><form id="loginForm"><label>Email</label><input id="loginEmail" type="email" required autocomplete="email"><label>Password</label><input id="loginPassword" type="password" required autocomplete="current-password"><button class="action" type="submit">Login</button></form><p><button id="resetPasswordBtn" class="action secondary" type="button">Forgot password?</button></p>
         <p><button id="logoutBtn" class="action secondary" type="button">Logout</button></p>
       </div>
     </div>
@@ -70,10 +75,10 @@
   <section id="profile" class="page hidden"><div class="card"><h2>My Profile</h2><div id="profileContent" class="muted">Please log in.</div></div></section>
   <section id="admin" class="page hidden"><h2>Admin Dashboard</h2><p class="muted">Verified administrator overview.</p><div id="adminContent" class="grid"><div class="empty">Checking administrator access…</div></div><div class="notice">This dashboard is read-only for now. Secure course, lesson, exam, and result management will be enabled only after trusted administrator setup.</div></section>
 </main>
-<footer>© <span id="year"></span> BAROK EDUCATION PRO · Learn Today, Lead Tomorrow</footer>
+<footer>© <span id="year"></span> BAROK EDUCATION PRO · Learn Today, Lead Tomorrow<br><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Use</a></footer>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -102,6 +107,7 @@
     message("Registration successful. Welcome!","success");$("registerForm").reset();
   }catch(err){message(err.message||"Registration failed.","error");}});
   $("loginForm").addEventListener("submit",async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("loginEmail").value.trim(),$("loginPassword").value);message("Login successful.","success");$("loginForm").reset();}catch(err){message(err.message||"Login failed.","error");}});
+  $("resetPasswordBtn").addEventListener("click",async()=>{const email=$("loginEmail").value.trim();if(!email){message("Enter your email address in the login form first.","error");$("loginEmail").focus();return;}try{await sendPasswordResetEmail(auth,email);message("If an account exists for this address, a password reset email has been sent.","success");}catch(err){message("Could not send the reset email. Check the address and Firebase Authentication settings.","error");}});
   $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);message("You have logged out.","success");}catch(err){message(err.message,"error");}});
 
   onAuthStateChanged(auth,async user=>{currentUser=user;student=null;isAdmin=false;$("adminNav").classList.add("hidden");if(user){try{const [snap,tokenResult]=await Promise.all([getDoc(doc(db,"students",user.uid)),user.getIdTokenResult()]);if(snap.exists())student=snap.data();isAdmin=tokenResult.claims.admin===true;if(isAdmin)$("adminNav").classList.remove("hidden");}catch(err){message("Could not load account permissions or student profile.","error");}}
