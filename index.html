@@ -30,7 +30,7 @@
     <button data-page="home" class="active">መነሻ</button><button data-page="account">መለያ</button>
     <button data-page="dashboard">የተማሪ ገጽ</button><button data-page="courses">ትምህርቶች</button>
     <button data-page="lessons">ማስታወሻዎች</button><button data-page="exams">ፈተናዎች</button>
-    <button data-page="results">ውጤቶች</button><button data-page="profile">መገለጫ</button>
+    <button data-page="results">ውጤቶች</button><button data-page="profile">መገለጫ</button><button data-page="admin" id="adminNav" class="hidden">Admin</button>
   </nav>
 </header>
 <main>
@@ -68,6 +68,7 @@
   <section id="exams" class="page hidden"><h2>Exams & Assessments</h2><p class="muted">Published assessments for Grades 9–12.</p><div class="card"><label for="examGradeFilter">Choose grade</label><select id="examGradeFilter"><option value="">All grades</option><option value="9">Grade 9</option><option value="10">Grade 10</option><option value="11">Grade 11</option><option value="12">Grade 12</option></select></div><div class="notice">Official exam answering, scoring, and submission require a secure server-side system.</div><div id="examsList" class="grid"><div class="empty">Loading exams…</div></div></section>
   <section id="results" class="page hidden"><h2>My Results</h2><div id="resultsList" class="grid"><div class="empty">Log in to view your results.</div></div></section>
   <section id="profile" class="page hidden"><div class="card"><h2>My Profile</h2><div id="profileContent" class="muted">Please log in.</div></div></section>
+  <section id="admin" class="page hidden"><h2>Admin Dashboard</h2><p class="muted">Verified administrator overview.</p><div id="adminContent" class="grid"><div class="empty">Checking administrator access…</div></div><div class="notice">This dashboard is read-only for now. Secure course, lesson, exam, and result management will be enabled only after trusted administrator setup.</div></section>
 </main>
 <footer>© <span id="year"></span> BAROK EDUCATION PRO · Learn Today, Lead Tomorrow</footer>
 <script type="module">
@@ -85,11 +86,11 @@
     measurementId: "G-V5CSCVEZKS"
   };
   const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
-  let currentUser = null, student = null;
+  let currentUser = null, student = null, isAdmin = false;
   const $ = id => document.getElementById(id);
   const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function message(text, type="notice"){ $("message").innerHTML = '<div class="notice '+type+'">'+safe(text)+'</div>'; window.scrollTo({top:0,behavior:"smooth"}); }
-  function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("hidden",p.id!==id));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="courses")loadPublic("courses","coursesList");if(id==="lessons")loadPublic("lessons","lessonsList");if(id==="exams")loadPublic("exams","examsList");if(id==="results")loadResults();}
+  function showPage(id){if(id==="admin"&&!isAdmin){message("Admin access is not enabled for this account.","error");id="home";}document.querySelectorAll(".page").forEach(p=>p.classList.toggle("hidden",p.id!==id));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="admin")loadAdminOverview();if(id==="courses")loadPublic("courses","coursesList");if(id==="lessons")loadPublic("lessons","lessonsList");if(id==="exams")loadPublic("exams","examsList");if(id==="results")loadResults();}
   document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
   document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.go)));
   $("year").textContent = new Date().getFullYear();
@@ -103,8 +104,8 @@
   $("loginForm").addEventListener("submit",async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("loginEmail").value.trim(),$("loginPassword").value);message("Login successful.","success");$("loginForm").reset();}catch(err){message(err.message||"Login failed.","error");}});
   $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);message("You have logged out.","success");}catch(err){message(err.message,"error");}});
 
-  onAuthStateChanged(auth,async user=>{currentUser=user;student=null;if(user){try{const snap=await getDoc(doc(db,"students",user.uid));if(snap.exists())student=snap.data();}catch(err){message("Could not load student profile. Check Firestore rules.","error");}}
-    renderAccount();renderDashboard();renderProfile();if(!document.getElementById("results").classList.contains("hidden"))loadResults();
+  onAuthStateChanged(auth,async user=>{currentUser=user;student=null;isAdmin=false;$("adminNav").classList.add("hidden");if(user){try{const [snap,tokenResult]=await Promise.all([getDoc(doc(db,"students",user.uid)),user.getIdTokenResult()]);if(snap.exists())student=snap.data();isAdmin=tokenResult.claims.admin===true;if(isAdmin)$("adminNav").classList.remove("hidden");}catch(err){message("Could not load account permissions or student profile.","error");}}
+    renderAccount();renderDashboard();renderProfile();if(!document.getElementById("results").classList.contains("hidden"))loadResults();if(!document.getElementById("admin").classList.contains("hidden")&&isAdmin)loadAdminOverview();
   });
   function renderAccount(){const status=currentUser?"Signed in as "+currentUser.email:"Not signed in";$("message").innerHTML=currentUser?'<div class="notice success">'+safe(status)+'</div>':"";}
   function renderDashboard(){
@@ -144,6 +145,7 @@
     if(!docs.length){target.innerHTML='<div class="empty">No matching published '+safe(collectionName)+' found. Try another filter.</div>';return;}
     target.innerHTML=docs.map(d=>{const x=d.data();return '<article class="card"><span class="pill">'+safe(x.grade?"Grade "+x.grade:"BAROK EDUCATION")+'</span><h3>'+safe(x.title||x.name||"Untitled")+'</h3><p class="muted">'+safe(x.description||x.subject||"")+'</p>'+(x.unit?'<p><strong>Unit:</strong> '+safe(x.unit)+'</p>':"")+(x.content?'<p>'+safe(x.content)+'</p>':"")+(x.url&&/^https:\/\//i.test(x.url)?'<a rel="noopener" target="_blank" href="'+safe(x.url)+'">Open resource</a>':"")+'</article>';}).join("");
   }catch(err){target.innerHTML='<div class="empty">Unable to load. Please check Firestore Security Rules.</div>';}}
+  async function loadAdminOverview(){const target=$("adminContent");if(!isAdmin){target.innerHTML='<div class="empty">Admin access is not enabled for this account.</div>';return;}target.innerHTML='<div class="empty">Loading overview…</div>';try{const names=["courses","lessons","exams"];const counts=await Promise.all(names.map(async name=>(await getDocs(query(collection(db,name),where("published","==",true)))).size));target.innerHTML=names.map((name,i)=>'<article class="card"><span class="pill">PUBLISHED</span><h3>'+name[0].toUpperCase()+name.slice(1)+'</h3><p style="font-size:30px;font-weight:800;margin:8px 0">'+counts[i]+'</p><p class="muted">Published '+name+'</p></article>').join("");}catch(err){target.innerHTML='<div class="empty">Could not load overview. Check Firestore read permissions.</div>';}}
   async function loadResults(){const target=$("resultsList");if(!currentUser){target.innerHTML='<div class="empty">Log in to view your results.</div>';return;}target.innerHTML='<div class="empty">Loading results…</div>';try{
     const snap=await getDocs(query(collection(db,"results"),where("uid","==",currentUser.uid)));
     if(snap.empty){target.innerHTML='<div class="empty">No results available yet.</div>';return;}
