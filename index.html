@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a43">
+  <title>BAROK EDUCATION PRO</title>
+  <style>
+    :root{--navy:#102a43;--blue:#1769aa;--gold:#f2b84b;--paper:#f4f7fb;--ink:#172b4d;--muted:#62748a;--white:#fff;--line:#dce5ef}
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Ethiopic",sans-serif;background:var(--paper);color:var(--ink)}
+    header{background:linear-gradient(120deg,#102a43,#1769aa);color:white;padding:22px max(18px,calc((100% - 1100px)/2))}
+    .brand{font-size:23px;font-weight:800;letter-spacing:.4px}.tag{color:#d8e8f7;margin-top:6px}
+    nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}nav button,.btn{border:0;border-radius:9px;padding:10px 14px;background:#ffffff1c;color:white;font-weight:700;cursor:pointer}
+    nav button.active,nav button:hover{background:var(--gold);color:#172b4d}
+    main{max-width:1100px;margin:24px auto;padding:0 16px}.hero{background:white;border-radius:18px;padding:30px;box-shadow:0 8px 28px #102a4310}
+    h1{margin:0 0 10px;font-size:clamp(25px,5vw,38px)}h2{margin-top:0}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:18px}
+    .card{background:white;border:1px solid var(--line);border-radius:14px;padding:18px}.card h3{margin:0 0 8px}.pill{display:inline-block;background:#eaf2fb;color:#14558a;border-radius:30px;padding:5px 10px;font-size:12px;font-weight:700}
+    input,select{width:100%;padding:12px;border:1px solid #cbd7e4;border-radius:9px;margin:6px 0 12px;font:inherit;background:white}
+    label{font-weight:700;font-size:14px}.action{background:var(--blue);color:white;border:0;padding:11px 16px;border-radius:9px;font-weight:700;cursor:pointer}.secondary{background:#eaf2fb;color:#14558a}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.hidden{display:none!important}.notice{padding:12px;border-radius:9px;background:#fff7df;color:#73510b;margin:12px 0}.success{background:#e7f7ee;color:#17643a}.error{background:#fff0f0;color:#a32626}
+    footer{text-align:center;padding:28px;color:var(--muted)}.empty{padding:18px;text-align:center;color:var(--muted);border:1px dashed #b9c8d8;border-radius:12px}
+    @media(max-width:600px){header{padding:18px}nav button{flex:1 1 28%;font-size:12px;padding:9px 5px}.hero{padding:22px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">BAROK EDUCATION PRO</div>
+  <div class="tag">Learn Today, Lead Tomorrow · Quality Education for Grades 9–12</div>
+  <nav id="nav">
+    <button data-page="home" class="active">መነሻ</button><button data-page="account">መለያ</button>
+    <button data-page="dashboard">የተማሪ ገጽ</button><button data-page="courses">ትምህርቶች</button>
+    <button data-page="lessons">ማስታወሻዎች</button><button data-page="exams">ፈተናዎች</button>
+    <button data-page="results">ውጤቶች</button><button data-page="profile">መገለጫ</button>
+  </nav>
+</header>
+<main>
+  <div id="message" aria-live="polite"></div>
+  <section id="home" class="page">
+    <div class="hero">
+      <span class="pill">GRADE 9–12</span>
+      <h1>Welcome to BAROK EDUCATION PRO!</h1>
+      <p>ወደ BAROK EDUCATION PRO እንኳን በደህና መጡ።</p>
+      <p class="muted">Learn Today, Lead Tomorrow. የትምህርት ማዕከልህ፤ ትምህርቶች፣ ማስታወሻዎች፣ ፈተናዎች እና ውጤቶች በአንድ ቦታ።</p>
+      <div class="row"><button class="action" data-go="courses">Browse Courses</button><button class="action secondary" data-go="account">Student Login / Register</button></div>
+    </div>
+    <div class="grid">
+      <div class="card"><h3>Grade 9–10</h3><p class="muted">Build strong foundations.</p></div>
+      <div class="card"><h3>Grade 11–12</h3><p class="muted">Prepare for the next step.</p></div>
+      <div class="card"><h3>Student Dashboard</h3><p class="muted">Access your learning profile.</p></div>
+    </div>
+  </section>
+  <section id="account" class="page hidden">
+    <div class="grid">
+      <div class="card"><h2>Student Registration</h2>
+        <form id="registerForm"><label>Full name</label><input id="regName" required maxlength="80" placeholder="Your full name">
+          <label>Grade</label><select id="regGrade" required><option value="">Choose grade</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+          <label>Email</label><input id="regEmail" type="email" required autocomplete="email"><label>Password</label><input id="regPassword" type="password" minlength="8" required autocomplete="new-password">
+          <button class="action" type="submit">Create account</button></form>
+      </div>
+      <div class="card"><h2>Student Login</h2><form id="loginForm"><label>Email</label><input id="loginEmail" type="email" required autocomplete="email"><label>Password</label><input id="loginPassword" type="password" required autocomplete="current-password"><button class="action" type="submit">Login</button></form>
+        <p><button id="logoutBtn" class="action secondary" type="button">Logout</button></p>
+      </div>
+    </div>
+  </section>
+  <section id="dashboard" class="page hidden"><div class="card"><h2>Student Dashboard</h2><div id="dashboardContent" class="muted">Please log in to view your dashboard.</div></div></section>
+  <section id="courses" class="page hidden"><h2>Courses</h2><p class="muted">Published courses for Grades 9–12.</p><div id="coursesList" class="grid"><div class="empty">Loading courses…</div></div></section>
+  <section id="lessons" class="page hidden"><h2>Lessons & Notes</h2><div id="lessonsList" class="grid"><div class="empty">Loading lessons…</div></div></section>
+  <section id="exams" class="page hidden"><h2>Exams</h2><div class="notice">ፈተናዎች ዝርዝር እዚህ ይታያል። Secure exam answering and submission will be enabled in a later update.</div><div id="examsList" class="grid"></div></section>
+  <section id="results" class="page hidden"><h2>My Results</h2><div id="resultsList" class="grid"><div class="empty">Log in to view your results.</div></div></section>
+  <section id="profile" class="page hidden"><div class="card"><h2>My Profile</h2><div id="profileContent" class="muted">Please log in.</div></div></section>
+</main>
+<footer>© <span id="year"></span> BAROK EDUCATION PRO · Learn Today, Lead Tomorrow</footer>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDV3MzFtl0q1Gofm50ZXyyrCrm4DMmMvfI",
+    authDomain: "barok-education-pro.firebaseapp.com",
+    projectId: "barok-education-pro",
+    storageBucket: "barok-education-pro.firebasestorage.app",
+    messagingSenderId: "410969423067",
+    appId: "1:410969423067:web:c386d4853aa523b89320fe",
+    measurementId: "G-V5CSCVEZKS"
+  };
+  const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
+  let currentUser = null, student = null;
+  const $ = id => document.getElementById(id);
+  const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function message(text, type="notice"){ $("message").innerHTML = '<div class="notice '+type+'">'+safe(text)+'</div>'; window.scrollTo({top:0,behavior:"smooth"}); }
+  function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("hidden",p.id!==id));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="courses")loadPublic("courses","coursesList");if(id==="lessons")loadPublic("lessons","lessonsList");if(id==="exams")loadPublic("exams","examsList");if(id==="results")loadResults();}
+  document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+  document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.go)));
+  $("year").textContent = new Date().getFullYear();
+
+  $("registerForm").addEventListener("submit",async e=>{e.preventDefault();try{
+    const name=$("regName").value.trim(), grade=$("regGrade").value, email=$("regEmail").value.trim();
+    const cred=await createUserWithEmailAndPassword(auth,email,$("regPassword").value);
+    await setDoc(doc(db,"students",cred.user.uid),{name,grade,email});
+    message("Registration successful. Welcome!","success");$("registerForm").reset();
+  }catch(err){message(err.message||"Registration failed.","error");}});
+  $("loginForm").addEventListener("submit",async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("loginEmail").value.trim(),$("loginPassword").value);message("Login successful.","success");$("loginForm").reset();}catch(err){message(err.message||"Login failed.","error");}});
+  $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);message("You have logged out.","success");}catch(err){message(err.message,"error");}});
+
+  onAuthStateChanged(auth,async user=>{currentUser=user;student=null;if(user){try{const snap=await getDoc(doc(db,"students",user.uid));if(snap.exists())student=snap.data();}catch(err){message("Could not load student profile. Check Firestore rules.","error");}}
+    renderAccount();renderDashboard();renderProfile();if(!document.getElementById("results").classList.contains("hidden"))loadResults();
+  });
+  function renderAccount(){const status=currentUser?"Signed in as "+currentUser.email:"Not signed in";$("message").innerHTML=currentUser?'<div class="notice success">'+safe(status)+'</div>':"";}
+  function renderDashboard(){if(!currentUser){$("dashboardContent").textContent="Please log in to view your dashboard.";return;}
+    $("dashboardContent").innerHTML='<p><strong>Name:</strong> '+safe(student?.name||"Not set")+'</p><p><strong>Grade:</strong> '+safe(student?.grade||"Not set")+'</p><p><strong>Email:</strong> '+safe(currentUser.email)+'</p><p class="muted">Use the Courses and Lessons sections to continue learning.</p>';}
+  function renderProfile(){if(!currentUser){$("profileContent").textContent="Please log in.";return;}
+    $("profileContent").innerHTML='<p><strong>Name:</strong> '+safe(student?.name||"Not set")+'</p><p><strong>Grade:</strong> '+safe(student?.grade||"Not set")+'</p><p><strong>Email:</strong> '+safe(currentUser.email)+'</p>';}
+  async function loadPublic(collectionName,targetId){const target=$(targetId);target.innerHTML='<div class="empty">Loading…</div>';try{
+    const snap=await getDocs(query(collection(db,collectionName),where("published","==",true)));
+    if(snap.empty){target.innerHTML='<div class="empty">No published '+safe(collectionName)+' available yet.</div>';return;}
+    target.innerHTML=snap.docs.map(d=>{const x=d.data();return '<article class="card"><span class="pill">'+safe(x.grade?"Grade "+x.grade:"BAROK EDUCATION")+'</span><h3>'+safe(x.title||x.name||"Untitled")+'</h3><p class="muted">'+safe(x.description||x.subject||"")+'</p>'+(x.content?'<p>'+safe(x.content)+'</p>':"")+(x.url&&/^https:\/\//i.test(x.url)?'<a rel="noopener" target="_blank" href="'+safe(x.url)+'">Open resource</a>':"")+'</article>';}).join("");
+  }catch(err){target.innerHTML='<div class="empty">Unable to load. Please check Firestore Security Rules.</div>';}}
+  async function loadResults(){const target=$("resultsList");if(!currentUser){target.innerHTML='<div class="empty">Log in to view your results.</div>';return;}target.innerHTML='<div class="empty">Loading results…</div>';try{
+    const snap=await getDocs(query(collection(db,"results"),where("uid","==",currentUser.uid)));
+    if(snap.empty){target.innerHTML='<div class="empty">No results available yet.</div>';return;}
+    target.innerHTML=snap.docs.map(d=>{const x=d.data();return '<article class="card"><h3>'+safe(x.examTitle||x.title||"Exam result")+'</h3><p>Score: '+safe(x.score??"—")+'</p><p class="muted">'+safe(x.date||"")+'</p></article>';}).join("");
+  }catch(err){target.innerHTML='<div class="empty">Unable to load results. Check Firestore rules.</div>';}}
+  showPage("home");
+</script>
+</body>
+</html>
