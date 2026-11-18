@@ -92,7 +92,7 @@ const lessons = [
     id: "g9_ict_computer_system",
     title: "Introduction to Computer Systems",
     grade: 9,
-    courseId: "grade9_ict",
+    courseId: "grade9_information_technology",
     unit: "Computer Fundamentals",
     description: "Hardware, software, input, processing, output and storage.",
     content: "A computer system accepts data, processes it according to instructions, produces information and can store results. Hardware means the physical parts of a computer, such as the keyboard, monitor, processor and storage drive. Software means the programs and instructions that tell hardware what to do. Input devices enter data, the CPU processes it, output devices present results, and storage devices keep data for later use."
@@ -101,7 +101,7 @@ const lessons = [
     id: "g9_ict_files_internet",
     title: "Files, Folders and Safe Internet Use",
     grade: 9,
-    courseId: "grade9_ict",
+    courseId: "grade9_information_technology",
     unit: "Digital Skills",
     description: "Organizing digital files and using the internet responsibly.",
     content: "A file stores information such as a document, image or presentation. A folder helps organize files. Use clear file names and save work in a suitable folder. The internet connects computer networks and provides services such as websites and email. Use strong, unique passwords, keep personal information private, check information with reliable sources, and avoid opening unexpected links or attachments. Ask a trusted adult or teacher for help when something online seems unsafe."
