@@ -137,7 +137,7 @@
     if(collectionName==="lessons"){
       const grade=$("lessonGradeFilter").value, subject=$("lessonSubjectFilter").value.toLowerCase();
       if(grade)docs=docs.filter(d=>String(d.data().grade)===grade);
-      if(subject)docs=docs.filter(d=>String(d.data().subject||d.data().title||"").toLowerCase().includes(subject));
+      if(subject){const slug=subject==="mathematics"?"math":subject==="information technology"?"information_technology":subject.replace(/\s+/g,"_");docs=docs.filter(d=>String(d.data().subject||"").toLowerCase().includes(subject)||String(d.data().courseId||"").toLowerCase().includes(slug)||String(d.data().title||"").toLowerCase().includes(subject));}
     }
     if(!docs.length){target.innerHTML='<div class="empty">No matching published '+safe(collectionName)+' found. Try another filter.</div>';return;}
     target.innerHTML=docs.map(d=>{const x=d.data();return '<article class="card"><span class="pill">'+safe(x.grade?"Grade "+x.grade:"BAROK EDUCATION")+'</span><h3>'+safe(x.title||x.name||"Untitled")+'</h3><p class="muted">'+safe(x.description||x.subject||"")+'</p>'+(x.unit?'<p><strong>Unit:</strong> '+safe(x.unit)+'</p>':"")+(x.content?'<p>'+safe(x.content)+'</p>':"")+(x.url&&/^https:\/\//i.test(x.url)?'<a rel="noopener" target="_blank" href="'+safe(x.url)+'">Open resource</a>':"")+'</article>';}).join("");
