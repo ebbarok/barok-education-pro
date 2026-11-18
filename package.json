@@ -1,0 +1,25 @@
+{
+  "name": "barok-education-pro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BAROK EDUCATION PRO learning platform for Grades 9–12",
+  "type": "module",
+  "scripts": {
+    "seed:courses": "node scripts/seed-courses.mjs",
+    "seed:grade9": "node scripts/seed-starter-lessons.mjs && node scripts/seed-grade9-subject-lessons.mjs",
+    "seed:grade10": "node scripts/seed-grade10-lessons.mjs",
+    "seed:grade11": "node scripts/seed-grade11-lessons.mjs",
+    "seed:grade12": "node scripts/seed-grade12-lessons.mjs",
+    "grant:admin": "node scripts/grant-admin.mjs",
+    "deploy": "firebase deploy --only hosting,firestore:rules"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.14.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
