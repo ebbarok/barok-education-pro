@@ -107,8 +107,21 @@
     renderAccount();renderDashboard();renderProfile();if(!document.getElementById("results").classList.contains("hidden"))loadResults();
   });
   function renderAccount(){const status=currentUser?"Signed in as "+currentUser.email:"Not signed in";$("message").innerHTML=currentUser?'<div class="notice success">'+safe(status)+'</div>':"";}
-  function renderDashboard(){if(!currentUser){$("dashboardContent").textContent="Please log in to view your dashboard.";return;}
-    $("dashboardContent").innerHTML='<p><strong>Name:</strong> '+safe(student?.name||"Not set")+'</p><p><strong>Grade:</strong> '+safe(student?.grade||"Not set")+'</p><p><strong>Email:</strong> '+safe(currentUser.email)+'</p><p class="muted">Use the Courses and Lessons sections to continue learning.</p>';}
+  function renderDashboard(){
+    if(!currentUser){
+      $("dashboardContent").innerHTML='<div class="empty">Please log in to view your personal learning dashboard.</div><button class="action" data-go-account>Login / Register</button>';
+      $("dashboardContent").querySelector("[data-go-account]")?.addEventListener("click",()=>showPage("account"));
+      return;
+    }
+    const grade=student?.grade||"Not set";
+    $("dashboardContent").innerHTML='<div class="grid">'+
+      '<article class="card"><span class="pill">MY PROFILE</span><h3>'+safe(student?.name||"Student")+'</h3><p><strong>Grade:</strong> '+safe(grade)+'</p><p><strong>Email:</strong> '+safe(currentUser.email)+'</p></article>'+
+      '<article class="card"><span class="pill">CONTINUE LEARNING</span><h3>Grade '+safe(grade)+' Courses</h3><p class="muted">Open your grade courses and explore published subjects.</p><button class="action" data-dash-go="courses">Browse Courses</button></article>'+
+      '<article class="card"><span class="pill">STUDY NOTES</span><h3>Lessons & Notes</h3><p class="muted">Read available lesson notes and learning materials.</p><button class="action" data-dash-go="lessons">Open Lessons</button></article>'+
+      '<article class="card"><span class="pill">ASSESSMENT</span><h3>My Results</h3><p class="muted">Review results published for your account.</p><button class="action" data-dash-go="results">View Results</button></article>'+
+      '</div>';
+    $("dashboardContent").querySelectorAll("[data-dash-go]").forEach(button=>button.addEventListener("click",()=>showPage(button.dataset.dashGo)));
+  }
   function renderProfile(){if(!currentUser){$("profileContent").textContent="Please log in.";return;}
     $("profileContent").innerHTML='<p><strong>Name:</strong> '+safe(student?.name||"Not set")+'</p><p><strong>Grade:</strong> '+safe(student?.grade||"Not set")+'</p><p><strong>Email:</strong> '+safe(currentUser.email)+'</p>';}
   async function loadPublic(collectionName,targetId){const target=$(targetId);target.innerHTML='<div class="empty">Loading…</div>';try{
